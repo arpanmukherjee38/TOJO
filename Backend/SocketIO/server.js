@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://tojo.onrender.com",
+    origin: "http://localhost:5002",
     methods: ["GET", "POST"],
   },
 });
