@@ -17,29 +17,36 @@ app.use(cookieParser());
 app.use(cors());
 
 const PORT = process.env.PORT || 3001;
-const URI = mongoose.connect(process.env.MONGODB_URI);
+const MONGO_URI = process.env.MONGODB_URI;
 
-try {
-    mongoose.connect(URI);
-    console.log("Connected to MongoDB");
-} catch (error) {
-    console.log(error);
-}
+// connect MongoDB
+(async () => {
+  try {
+    await mongoose.connect(MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
+    console.log("✅ Connected to MongoDB");
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error);
+    process.exit(1);
+  }
+})();
 
-//routes
+// api routes
 app.use("/api/user", userRoute);
 app.use("/api/message", messageRoute);
 
-
-
-if (process.env.NODE_ENV === 'production') {
-    const dirPath = path.resolve();
-    app.use(express.static("./Frontend/dist"));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(dirPath, './Frontend/dist','index.html'));
-    });
+// production build
+if (process.env.NODE_ENV === "production") {
+  const __dirname = path.resolve();
+  app.use(express.static("./Frontend/dist"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "./Frontend/dist", "index.html"));
+  });
 }
 
+// start server
 server.listen(PORT, () => {
-    console.log(`Server is Running on port ${PORT}`);
+  console.log(`🚀 Server is Running on port ${PORT}`);
 });
+
